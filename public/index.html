@@ -14,7 +14,7 @@
         <button id="create-room">Create Room</button>
         <button id="join-room">Join Room</button>
     </div>
-    <div id="game">
+    <div id="game" style="display: none;">
         <div>
             <button id="green-button">Green</button>
             <button id="red-button">Red</button>
@@ -23,11 +23,12 @@
         <div id="room-info">
             <p>Invite others using this link:</p>
             <input type="text" id="room-link-display" readonly>
+            <div id="user-count">Users in room: ?</div>
         </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="script.js"></script>
-    <script src="game.js"></script>
+    <script src="script.js" type="module"></script>
+    <script src="game.js" type="module"></script>
 </body>
 
 </html>

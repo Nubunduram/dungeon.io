@@ -1,31 +1,45 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import { MAX_USERS_PER_ROOM } from './public/things/constants.js';
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new Server(server);
+
+const roomOccupancy = {};
 
 app.use(express.static('public'));
 
 // Handle socket connections
 io.on('connection', (socket) => {
-    console.log("User on website");
+    socket.on('joinRoom', ({ roomId, username, isDm }) => {
+        if (!roomOccupancy[roomId]) {
+            roomOccupancy[roomId] = 0;
+        }
 
-    socket.on('createNewRoom', ({ roomId, username }) => {
-        socket.join(roomId);
-        console.log(`${username} created a new room: ${roomId}`);
-        socket.to(roomId).emit('message', `${username} has joined the room`);
-    })
+        if (roomOccupancy[roomId] < MAX_USERS_PER_ROOM) {
+            socket.join(roomId);
+            roomOccupancy[roomId]++;
+            socket.roomId = roomId; // Store roomId in socket object
 
-    socket.on('joinRoom', ({ roomId, username }) => {
-        socket.join(roomId);
-        console.log(`${username} joined room ${roomId}`);
-        socket.to(roomId).emit('message', `${username} has joined the room`);
+            // Notify room about the new user
+            io.to(roomId).emit('userJoined', { count: roomOccupancy[roomId] });
+        } else {
+            socket.emit('roomFull', { roomId });
+        }
     });
 
     socket.on('disconnect', () => {
-        console.log('User disconnected');
+        const roomId = socket.roomId;
+        if (roomId && roomOccupancy[roomId]) {
+            roomOccupancy[roomId]--;
+            if (roomOccupancy[roomId] === 0) {
+                delete roomOccupancy[roomId];
+            } else {
+                io.to(roomId).emit('userLeft', { count: roomOccupancy[roomId] });
+            }
+        }
     });
 });
 
