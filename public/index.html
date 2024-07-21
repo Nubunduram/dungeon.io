@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon.io</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="home">
+        <input type="text" autocomplete="off" id="username" placeholder="Enter your name" required>
+        <button id="create-room">Create Room</button>
+        <button id="join-room">Join Room</button>
+    </div>
+    <div id="game">
+        <div>
+            <button id="green-button">Green</button>
+            <button id="red-button">Red</button>
+            <button id="blue-button">Blue</button>
+        </div>
+        <div id="room-info">
+            <p>Invite others using this link:</p>
+            <input type="text" id="room-link-display" readonly>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+    <script src="game.js"></script>
+</body>
+
+</html>
