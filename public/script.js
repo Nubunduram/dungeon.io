@@ -1,4 +1,4 @@
-import { updateUserCount } from "./things/utils.js";
+import { updateDmDisplay, updatePlayersDisplay, updateUserCount } from "./things/utils.js";
 
 const socket = io();
 
@@ -9,6 +9,8 @@ const createRoomButton = document.getElementById('create-room');
 const joinRoomButton = document.getElementById('join-room');
 const roomLinkDisplay = document.getElementById('room-link-display');
 const userCountDisplay = document.getElementById('user-count');
+const dmDisplay = document.getElementById('dm');
+const playersDisplay = document.getElementById('players');
 
 function showGameUI() {
     home.style.display = 'none';
@@ -46,7 +48,7 @@ window.onload = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get('room');
     const username = urlParams.get('username');
-    const isDm = urlParams.get('isDm');
+    const isDm = urlParams.get('isDm') === 'true';
     const roomLink = `${window.location.origin}/?room=${roomId}`;
     roomLinkDisplay.value = roomLink;
 
@@ -56,13 +58,24 @@ window.onload = () => {
     }
 };
 
-socket.on('roomFull', ({ roomId }) => {
-    alert(`Room ${roomId} is full. Please try another room.`);
+socket.on('roomFull', () => {
+    alert(`Room you are trying to join is full. Please try another room.`);
     window.location.href = '/';
 });
-socket.on('userJoined', ({ count }) => {
-    updateUserCount(count, userCountDisplay);
+
+socket.on('roomClosed', () => {
+    alert('The room has been closed because the DM left. You will be redirected.');
+    window.location.href = '/';
 });
-socket.on('userLeft', ({ count }) => {
+
+socket.on('userJoined', ({ count, dm, players }) => {
     updateUserCount(count, userCountDisplay);
+    updateDmDisplay(dm, dmDisplay);
+    updatePlayersDisplay(players, playersDisplay);
 });
+
+socket.on('userLeft', ({ count, players }) => {
+    updateUserCount(count, userCountDisplay);
+    updatePlayersDisplay(players, playersDisplay);
+});
+

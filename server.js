@@ -7,24 +7,39 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const roomOccupancy = {};
+const rooms = {};
 
 app.use(express.static('public'));
 
 // Handle socket connections
 io.on('connection', (socket) => {
     socket.on('joinRoom', ({ roomId, username, isDm }) => {
-        if (!roomOccupancy[roomId]) {
-            roomOccupancy[roomId] = 0;
+        // check if room exist
+        if (!rooms[roomId]) {
+            rooms[roomId] = {
+                userCount: 0,
+                dm: username,
+                players: []
+            };
         }
 
-        if (roomOccupancy[roomId] < MAX_USERS_PER_ROOM) {
-            socket.join(roomId);
-            roomOccupancy[roomId]++;
-            socket.roomId = roomId; // Store roomId in socket object
+        const room = rooms[roomId];
 
-            // Notify room about the new user
-            io.to(roomId).emit('userJoined', { count: roomOccupancy[roomId] });
+        if (room.userCount < MAX_USERS_PER_ROOM) {
+            socket.join(roomId);
+
+            room.userCount++;
+            socket.roomId = roomId;
+            socket.username = username;
+            socket.isDm = isDm;
+
+            room.players.push({ name: username, isDm: isDm });
+
+            io.to(roomId).emit('userJoined', {
+                count: room.userCount,
+                dm: room.dm,
+                players: room.players
+            });
         } else {
             socket.emit('roomFull', { roomId });
         }
@@ -32,12 +47,19 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         const roomId = socket.roomId;
-        if (roomId && roomOccupancy[roomId]) {
-            roomOccupancy[roomId]--;
-            if (roomOccupancy[roomId] === 0) {
-                delete roomOccupancy[roomId];
+        const username = socket.username;
+        const isDm = socket.isDm;
+
+        if (roomId && rooms[roomId]) {
+            const room = rooms[roomId];
+
+            if (isDm) {
+                io.to(roomId).emit('roomClosed');
+                delete rooms[roomId];
             } else {
-                io.to(roomId).emit('userLeft', { count: roomOccupancy[roomId] });
+                room.players = room.players.filter(player => player.name !== username);
+                room.userCount--;
+                io.to(roomId).emit('userLeft', { count: room.userCount, players: room.players });
             }
         }
     });
