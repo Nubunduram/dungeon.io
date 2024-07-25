@@ -1,4 +1,4 @@
-import { updateDmDisplay, updatePlayersDisplay, updateUserCount } from "./things/utils.js";
+import { updateDmDisplay, updatePlayersDisplay, updateUserCount } from "./utils.js";
 
 const socket = io();
 

@@ -1,19 +1,20 @@
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
-import { MAX_USERS_PER_ROOM } from './public/things/constants.js';
+import { MAX_USERS_PER_ROOM } from './Types/constants';
+import { Room } from './Types/interface';
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const rooms = {};
+const rooms: Record<string, Room> = {};
 
 app.use(express.static('public'));
 
 // Handle socket connections
 io.on('connection', (socket) => {
-    socket.on('joinRoom', ({ roomId, username, isDm }) => {
+    socket.on('joinRoom', ({ roomId, username, isDm }: { roomId: string; username: string; isDm: boolean }) => {
         // check if room exist
         if (!rooms[roomId]) {
             rooms[roomId] = {
@@ -27,13 +28,11 @@ io.on('connection', (socket) => {
 
         if (room.userCount < MAX_USERS_PER_ROOM) {
             socket.join(roomId);
-
             room.userCount++;
-            socket.roomId = roomId;
-            socket.username = username;
-            socket.isDm = isDm;
 
-            room.players.push({ name: username, isDm: isDm });
+            socket.data = { roomId, username, isDm };
+
+            room.players.push({ name: username, isDm });
 
             io.to(roomId).emit('userJoined', {
                 count: room.userCount,
@@ -46,9 +45,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        const roomId = socket.roomId;
-        const username = socket.username;
-        const isDm = socket.isDm;
+        const { roomId, username, isDm } = socket.data;
 
         if (roomId && rooms[roomId]) {
             const room = rooms[roomId];

@@ -16,3 +16,8 @@ export function updatePlayersDisplay(players, playersDisplay) {
     // Update the display with the joined names
     playersDisplay.innerHTML = `Players: ${playerNamesString}`;
 }
+
+export function hideAndShowUI(toHide, toShow) {
+    toHide.style.display = 'none';
+    toShow.style.display = 'block';
+}

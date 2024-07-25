@@ -1,6 +1,7 @@
 /* Add CSS styles here */
 body {
     font-family: Arial, sans-serif;
+    height: 100dvh;
 }
 
 #home {
@@ -10,7 +11,8 @@ body {
     margin-top: 50px;
 }
 
-#home input, #home button {
+#home input,
+#home button {
     margin: 10px;
     padding: 10px;
     font-size: 16px;
@@ -18,18 +20,31 @@ body {
 
 #game {
     display: none;
+    max-width: 80%;
+    margin: auto;
+}
+
+#game>main {
+    height: 400px;
+    background-color: red;
+}
+
+#game>header>#room-infos {
+    display: flex;
+    width: 100%;
+    margin: auto;
+    gap: 16px;
+}
+
+#game>footer>#room-link {
     text-align: center;
-    margin-top: 20px;
 }
 
-#room-info {
-    margin-top: 20px;
-}
-
-#room-link-display {
+#game>footer>#room-link>#room-link-display {
+    text-align: center;
     font-size: 16px;
-    padding: 10px;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    width: 80%;
+    width: 100%;
 }

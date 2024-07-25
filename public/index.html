@@ -1,33 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dungeon.io</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div id="home">
+    <section id="home">
         <input type="text" autocomplete="off" id="username" placeholder="Enter your name" required>
         <button id="create-room">Create Room</button>
         <button id="join-room">Join Room</button>
-    </div>
-    <div id="game">
-        <div>
+    </section>
+    <section id="game">
+        <header>
+            <div id="room-infos">
+                <p id="user-count">Users in room: ?</p>
+                <p id="dm">DM: None</p>
+                <p id="players">Players: None</p>
+            </div>
+        </header>
+        <main>
             <button id="green-button">Green</button>
             <button id="red-button">Red</button>
             <button id="blue-button">Blue</button>
-        </div>
-        <div id="room-info">
-            <p>Invite others using this link:</p>
-            <input type="text" id="room-link-display" readonly>
-            <div id="user-count">Users in room: ?</div>
-            <div id="dm">DM: None</div>
-            <div id="players">Players: None</div>
-        </div>
-    </div>
+        </main>
+        <footer>
+            <div id="room-link">
+                <p>Invite others using this link:</p>
+                <input type="text" id="room-link-display" readonly>
+            </div>
+        </footer>
+    </section>
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="script.js"></script>
     <script type="module" src="game.js"></script>
 </body>
+
 </html>
