@@ -11,6 +11,7 @@ const roomLinkDisplay = document.getElementById('room-link-display');
 const userCountDisplay = document.getElementById('user-count');
 const dmDisplay = document.getElementById('dm');
 const playersDisplay = document.getElementById('players');
+const readyButton = document.getElementById('ready-button');
 
 function showGameUI() {
     home.style.display = 'none';
@@ -34,6 +35,7 @@ joinRoomButton.addEventListener('click', () => {
         const isDm = false;
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('room');
+
         if (roomId) {
             window.location.href = `/?room=${roomId}&username=${username}&isDm=${isDm}`;
         } else {
@@ -49,14 +51,20 @@ window.onload = () => {
     const roomId = urlParams.get('room');
     const username = urlParams.get('username');
     const isDm = urlParams.get('isDm') === 'true';
+    const ready = false;
     const roomLink = `${window.location.origin}/?room=${roomId}`;
     roomLinkDisplay.value = roomLink;
 
     if (roomId && username) {
         showGameUI();
-        socket.emit('joinRoom', { roomId, username, isDm });
+        socket.emit('joinRoom', { roomId, username, isDm, ready });
     }
 };
+
+readyButton.addEventListener('click', () => {
+    socket.emit('playerReady');
+    readyButton.style.display = 'none'; // Hide the button after clicking
+});
 
 socket.on('roomFull', () => {
     alert(`Room you are trying to join is full. Please try another room.`);
@@ -79,3 +87,10 @@ socket.on('userLeft', ({ count, players }) => {
     updatePlayersDisplay(players, playersDisplay);
 });
 
+socket.on('playerReadyUpdate', ({ players }) => {
+    updatePlayersDisplay(players, playersDisplay);
+});
+
+socket.on('startGame', () => {
+    alert('All players are ready. The game is starting!');
+});

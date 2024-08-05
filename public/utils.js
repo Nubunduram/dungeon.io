@@ -6,18 +6,14 @@ export function updateDmDisplay(dm, dmDisplay) {
     dmDisplay.textContent = `DM: ${dm}`;
 }
 
-export function updatePlayersDisplay(players, playersDisplay) {
-    // Extract names from the players array
-    const playerNames = players.map(player => player.name);
-
-    // Join the names with a comma
-    const playerNamesString = playerNames.join(', ');
-
-    // Update the display with the joined names
-    playersDisplay.innerHTML = `Players: ${playerNamesString}`;
-}
-
 export function hideAndShowUI(toHide, toShow) {
     toHide.style.display = 'none';
     toShow.style.display = 'block';
+}
+
+export function updatePlayersDisplay(players, playersDisplay) {
+    playersDisplay.innerHTML = 'Players:';
+    players.forEach(player => {
+        playersDisplay.innerHTML += `${player.name} ${player.ready ? '(Ready)' : ''}`;
+    });
 }
